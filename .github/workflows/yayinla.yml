@@ -1,21 +1,21 @@
 name: Siteyi yayınla
 
+# Her kayıttan (push) sonra siteyi derler ve Natro hosting'e FTP ile yükler.
+# Gerekli depo sırları (Settings → Secrets and variables → Actions):
+#   FTP_USERNAME : cPanel'de oluşturulan FTP hesabı (ör. deneme@usrakou.com)
+#   FTP_PASSWORD : o hesabın şifresi
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: deploy
+  cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,15 +25,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - uses: actions/upload-pages-artifact@v3
+      - name: Hosting'e yükle (FTP)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          path: dist
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          server: cpls56.srvpanel.com
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./dist/deneme/
+          server-dir: ./
