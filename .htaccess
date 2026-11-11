@@ -1,0 +1,4 @@
+# Natro hosting (Apache)
+RedirectMatch 404 /\.git
+ErrorDocument 404 /deneme/404.html
+Options -Indexes
