@@ -245,7 +245,8 @@ ${items.length ? `<div class="grid">${items.map(card).join('')}</div>` : '<div c
 }
 
 // 404, site haritası, robots
-fs.writeFileSync(path.join(OUT, '404.html'), layout({ title: 'Sayfa bulunamadı', rel: '404.html', current: null, body: `<div class="empty">Aradığınız sayfa bulunamadı. <a href="${u('')}">Ana sayfaya dönün.</a></div>` }));
+fs.writeFileSync(path.join(SITE_DIR, '.htaccess'), `# Natro hosting (Apache)\nRedirectMatch 404 /\\.git\nErrorDocument 404 ${BASE}404.html\nOptions -Indexes\n`);
+fs.writeFileSync(path.join(SITE_DIR, '404.html'), layout({ title: 'Sayfa bulunamadı', rel: '404.html', current: null, body: `<div class="empty">Aradığınız sayfa bulunamadı. <a href="${u('')}">Ana sayfaya dönün.</a></div>` }));
 const urls = ['', ...TABS.map((t) => t.id + '/'), ...all.map((i) => `${i.section}/${i.slug}/`)];
 if (PUBLIC) fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((p) => `<url><loc>${SITE_URL}/${p}</loc></url>`).join('\n')}\n</urlset>\n`);
 fs.writeFileSync(path.join(OUT, 'robots.txt'), PUBLIC ? `User-agent: *\nDisallow: ${BASE}admin/\nSitemap: ${SITE_URL}/sitemap.xml\n` : `User-agent: *\nDisallow: /\n`);

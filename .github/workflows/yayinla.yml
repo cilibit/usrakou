@@ -1,14 +1,16 @@
 name: Siteyi yayınla
 
-# Her kayıttan (push) sonra siteyi derler ve Natro hosting'e FTP ile yükler.
-# Gerekli depo sırları (Settings → Secrets and variables → Actions):
-#   FTP_USERNAME : Natro hosting FTP kullanıcı adı (cPanel kullanıcı adı)
-#   FTP_PASSWORD : FTP şifresi (Natro → Ftp Şifre Değiştirme Merkezi)
+# Her kayıttan (push) sonra siteyi derler ve hazır siteyi "yayin" dalına koyar.
+# Natro hosting'deki zamanlanmış görev bu dalı birkaç dakikada bir
+# public_html/deneme klasörüne çeker. Şifre gerekmez.
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 concurrency:
   group: deploy
@@ -25,12 +27,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Hosting'e yükle (FTP)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Hazır siteyi yayin dalına koy
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          server: cpls56.srvpanel.com
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: ./dist/deneme/
-          server-dir: public_html/deneme/
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: yayin
+          publish_dir: ./dist/deneme
+          force_orphan: true
+          enable_jekyll: true
+          commit_message: "Site derlendi"

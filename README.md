@@ -4,5 +4,5 @@ Kocaeli Üniversitesi Anesteziyoloji ve Reanimasyon AD rejyonal anestezi sayfas�
 
 - İçerik düzenleme: https://usrakou.com/admin (GitHub erişim anahtarı ile giriş)
 - İçerikler: `content/` (Markdown). Görseller: `static/img`, panelden yüklenenler `static/uploads`.
-- Her kayıttan sonra GitHub Actions siteyi derleyip Natro hosting'e (public_html/deneme) FTP ile yükler (1–2 dakika).
+- Her kayıttan sonra GitHub Actions siteyi derleyip `yayin` dalına koyar; Natro hosting'deki cron görevi bu dalı `public_html/deneme` klasörüne çeker (birkaç dakika).
 - Yerelde derleme: `npm ci && npm run build` → `dist/`
