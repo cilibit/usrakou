@@ -124,6 +124,7 @@ function layout({ title, desc, rel, current, body, image }) {
 <title>${esc(full)}</title>
 ${PUBLIC ? '' : '<meta name="robots" content="noindex, nofollow">\n'}<meta name="description" content="${esc(desc || site.home_intro || '')}">
 <link rel="canonical" href="${esc(canon)}">
+<script>if(/github\.io$/.test(location.hostname))location.replace(${JSON.stringify(SITE_URL.replace('https://','http://'))}+'/'+${JSON.stringify(rel)});</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(full)}">
 <meta property="og:description" content="${esc(desc || site.home_intro || '')}">
