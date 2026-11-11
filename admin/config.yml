@@ -1,0 +1,105 @@
+# usrakou.com yönetim paneli (Sveltia CMS)
+backend:
+  name: github
+  repo: GITHUB_KULLANICI/REPO_ADI
+  branch: main
+
+site_url: https://usrakou.com
+display_url: https://usrakou.com
+logo_url: /assets/favicon.svg
+
+media_folder: static/uploads
+public_folder: /uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: kilavuzlar
+    label: Kılavuzlar
+    label_singular: Kılavuz
+    description: Yayınlanmış derlemelerin özetlenmiş Türkçe uyarlamaları.
+    folder: content/kilavuzlar
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: [order, title, date]
+    preview_path: "kilavuzlar/{{slug}}/"
+    fields: &alanlar
+      - { label: Başlık, name: title, widget: string }
+      - { label: Alt başlık / özgün başlık, name: subtitle, widget: string, required: false }
+      - { label: Yazarlar, name: authors, widget: string, required: false, hint: "Virgülle ayırın. Kartta ilk iki yazar ve 've ark.' görünür." }
+      - { label: Kısa özet, name: summary, widget: text, required: false, hint: "Kartta ve arama motorlarında görünen 1-2 cümle." }
+      - { label: Sıra, name: order, widget: number, value_type: int, required: false, hint: "Küçük sayı önce gelir (0, 1, 2...)." }
+      - { label: Tarih, name: date, widget: datetime, time_format: false, format: "YYYY-MM-DD", required: false }
+      - { label: Kapak görseli, name: cover, widget: image, required: false, hint: "Kartın üstünde görünür. Boş bırakılabilir." }
+      - { label: Video bağlantısı, name: video_url, widget: string, required: false, hint: "YouTube ya da Vimeo bağlantısı. Sayfanın en üstünde oynatılır." }
+      - { label: Video dosyası, name: video, widget: file, required: false, hint: "Kısa MP4 dosyaları için (25 MB altı). Uzun videoları YouTube'a 'liste dışı' yükleyip bağlantısını yukarıya yapıştırın." }
+      - { label: Dergi / etiket, name: journal, widget: string, required: false, hint: "Kartta küçük etiket olarak görünür. Örnek: BMC Anesthesiology 2025" }
+      - { label: Künye, name: citation, widget: text, required: false }
+      - { label: DOI, name: doi, widget: string, required: false, hint: "Yalnızca DOI. Örnek: 10.1186/s12871-025-03193-w" }
+      - { label: Bağlantı (DOI yoksa), name: url, widget: string, required: false }
+      - { label: Lisans / telif notu, name: license, widget: string, required: false }
+      - { label: Not, name: note, widget: string, required: false, hint: "Başlığın altında küçük yazıyla görünür." }
+      - label: Kaynaklar
+        name: refs
+        widget: list
+        required: false
+        hint: "Sırayla ekleyin. Metinde [3] ya da [3–5] yazdığınız numaralar bu listeye bağlanır."
+        field: { label: Kaynak, name: ref, widget: text }
+      - { label: Taslak (yayınlama), name: draft, widget: boolean, default: false, required: false }
+      - label: Metin
+        name: body
+        widget: markdown
+        hint: >-
+          Kutular için satır başına > [!YAPIN], > [!YAPMAYIN], > [!IPUCU] ya da > [!DIKKAT] yazın ve kutunun içeriğini
+          altındaki satırlara yine > ile başlayarak yazın. Kontrol listesi: - [ ] madde.
+          Video: @[video](YouTube bağlantısı). Görselin açıklaması şekil altyazısı olur.
+          Bu yazımlar için düzenleyiciyi Markdown moduna almanız daha kolaydır.
+  - name: teknikler
+    label: Teknikler
+    label_singular: Teknik
+    description: Blok tekniklerinin adım adım anlatımı.
+    folder: content/teknikler
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [order, title, date]
+    preview_path: "teknikler/{{slug}}/"
+    fields: *alanlar
+  - name: videolar
+    label: Videolar
+    label_singular: Video
+    description: Eğitim videoları. Videoyu 'Video bağlantısı' alanına ekleyin.
+    folder: content/videolar
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [order, title, date]
+    preview_path: "videolar/{{slug}}/"
+    fields: *alanlar
+  - name: sayfalar
+    label: Sayfalar
+    files:
+      - label: Hakkında
+        name: hakkinda
+        file: content/sayfalar/hakkinda.md
+        fields:
+          - { label: Başlık, name: title, widget: string }
+          - { label: Metin, name: body, widget: markdown }
+  - name: ayarlar
+    label: Site ayarları
+    files:
+      - label: Ana sayfa ve sekmeler
+        name: site
+        file: content/site.yml
+        fields:
+          - { label: Ana sayfa başlığı, name: home_title, widget: string }
+          - { label: Ana sayfa giriş metni, name: home_intro, widget: text }
+          - label: Sekmeler
+            name: tabs
+            widget: object
+            fields:
+              - { label: Kılavuzlar, name: kilavuzlar, widget: object, fields: [{ label: Sekme adı, name: title, widget: string }, { label: Açıklama, name: intro, widget: text, required: false }] }
+              - { label: Teknikler, name: teknikler, widget: object, fields: [{ label: Sekme adı, name: title, widget: string }, { label: Açıklama, name: intro, widget: text, required: false }] }
+              - { label: Videolar, name: videolar, widget: object, fields: [{ label: Sekme adı, name: title, widget: string }, { label: Açıklama, name: intro, widget: text, required: false }] }
+              - { label: Hakkında, name: hakkinda, widget: object, fields: [{ label: Sekme adı, name: title, widget: string }, { label: Açıklama, name: intro, widget: text, required: false }] }

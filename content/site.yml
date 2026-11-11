@@ -1,0 +1,15 @@
+home_title: Rejyonal Anestezi
+home_intro: Ultrasonografi eşliğinde rejyonal anestezi ve fasyal plan blokları için Türkçe kılavuzlar, teknik anlatımlar ve videolar. İçerikler Kocaeli Üniversitesi Anesteziyoloji ve Reanimasyon Anabilim Dalı rejyonal anestezi ekibi tarafından hazırlanmaktadır.
+tabs:
+  kilavuzlar:
+    title: Kılavuzlar
+    intro: Ekibimizin yayımladığı derlemelerin özetlenmiş Türkçe uyarlamaları. Her yazıda özgün yayının künyesi yer alır.
+  teknikler:
+    title: Teknikler
+    intro: Blok tekniklerinin adım adım anlatımı, sono-anatomi görüntüleri ve ipuçları.
+  videolar:
+    title: Videolar
+    intro: Blok uygulamalarına ait eğitim videoları.
+  hakkinda:
+    title: Hakkında
+    intro: ''
