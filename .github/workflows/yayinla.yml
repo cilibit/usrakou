@@ -2,8 +2,8 @@ name: Siteyi yayınla
 
 # Her kayıttan (push) sonra siteyi derler ve Natro hosting'e FTP ile yükler.
 # Gerekli depo sırları (Settings → Secrets and variables → Actions):
-#   FTP_USERNAME : cPanel'de oluşturulan FTP hesabı (ör. deneme@usrakou.com)
-#   FTP_PASSWORD : o hesabın şifresi
+#   FTP_USERNAME : Natro hosting FTP kullanıcı adı (cPanel kullanıcı adı)
+#   FTP_PASSWORD : FTP şifresi (Natro → Ftp Şifre Değiştirme Merkezi)
 
 on:
   push:
@@ -33,4 +33,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps
           local-dir: ./dist/deneme/
-          server-dir: ./
+          server-dir: public_html/deneme/
