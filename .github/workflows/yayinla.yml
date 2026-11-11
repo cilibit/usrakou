@@ -2,7 +2,8 @@ name: Siteyi yayınla
 
 # Her kayıttan (push) sonra siteyi derler ve hazır siteyi "yayin" dalına koyar.
 # Natro hosting'deki zamanlanmış görev bu dalı birkaç dakikada bir
-# public_html/deneme klasörüne çeker. Şifre gerekmez.
+# public_html/deneme klasörüne çeker (cPanel → Cron İşleri). Şifre gerekmez.
+# Elle güncellemek için: cPanel → Git Version Control → Yönet → Pull or Deploy → Update from Remote.
 
 on:
   push:
@@ -33,6 +34,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: yayin
           publish_dir: ./dist/deneme
-          force_orphan: true
+          force_orphan: false
           enable_jekyll: true
           commit_message: "Site derlendi"
