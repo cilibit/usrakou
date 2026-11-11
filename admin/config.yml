@@ -1,12 +1,12 @@
 # usrakou.com yönetim paneli (Sveltia CMS)
 backend:
   name: github
-  repo: GITHUB_KULLANICI/REPO_ADI
+  repo: __REPO__
   branch: main
 
-site_url: https://usrakou.com
-display_url: https://usrakou.com
-logo_url: /assets/favicon.svg
+site_url: __SITE_URL__
+display_url: __SITE_URL__
+logo_url: __BASE__assets/favicon.svg
 
 media_folder: static/uploads
 public_folder: /uploads

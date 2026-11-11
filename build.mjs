@@ -7,8 +7,12 @@ import { marked } from 'marked';
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
 const OUT = path.join(ROOT, 'dist');
-const SITE_URL = 'https://usrakou.com';
-const BASE = (process.env.SITE_BASE || '/').replace(/\/?$/, '/');
+const CFG = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf8'));
+// base: sitenin yayınlandığı alt klasör. "/deneme/" iken site usrakou.com/deneme adresindedir; kök için "/" yapın.
+const BASE = (CFG.base || '/').replace(/^\/?/, '/').replace(/\/?$/, '/');
+const PUBLIC = !!CFG.public;
+const SITE_URL = 'https://' + CFG.domain + BASE.replace(/\/$/, '');
+const SITE_DIR = path.join(OUT, BASE);
 const u = (p) => BASE + p.replace(/^\//, '');
 
 marked.setOptions({ gfm: true, breaks: false });
@@ -118,7 +122,7 @@ function layout({ title, desc, rel, current, body, image }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(full)}</title>
-<meta name="description" content="${esc(desc || site.home_intro || '')}">
+${PUBLIC ? '' : '<meta name="robots" content="noindex, nofollow">\n'}<meta name="description" content="${esc(desc || site.home_intro || '')}">
 <link rel="canonical" href="${esc(canon)}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(full)}">
@@ -187,7 +191,7 @@ ${refs}
 }
 
 function write(rel, html) {
-  const f = path.join(OUT, rel, 'index.html');
+  const f = path.join(SITE_DIR, rel, 'index.html');
   fs.mkdirSync(path.dirname(f), { recursive: true });
   fs.writeFileSync(f, html);
 }
@@ -203,10 +207,19 @@ function copyDir(src, dst) {
 
 /* ---------- derleme ---------- */
 fs.rmSync(OUT, { recursive: true, force: true });
-copyDir(path.join(ROOT, 'static'), OUT);
-copyDir(path.join(ROOT, 'admin'), path.join(OUT, 'admin'));
-fs.writeFileSync(path.join(OUT, 'CNAME'), 'usrakou.com\n');
+copyDir(path.join(ROOT, 'static'), SITE_DIR);
+// Yönetim paneli: yapılandırmadaki yer tutucuları doldur
+fs.mkdirSync(path.join(SITE_DIR, 'admin'), { recursive: true });
+for (const f of fs.readdirSync(path.join(ROOT, 'admin'))) {
+  const txt = fs.readFileSync(path.join(ROOT, 'admin', f), 'utf8').replaceAll('__BASE__', BASE).replaceAll('__SITE_URL__', SITE_URL).replaceAll('__REPO__', CFG.repo);
+  fs.writeFileSync(path.join(SITE_DIR, 'admin', f), txt);
+}
+fs.writeFileSync(path.join(OUT, 'CNAME'), CFG.domain + '\n');
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
+if (BASE !== '/') {
+  // Site alt klasördeyken kök adres sade bir bekleme sayfası gösterir
+  fs.writeFileSync(path.join(OUT, 'index.html'), `<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>${esc(CFG.domain)}</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;background:#f4f7f6;color:#12201c}div{text-align:center;padding:24px}b{display:block;font-size:22px;margin-bottom:6px}span{color:#55655f}</style></head><body><div><b>Kocaeli Üniversitesi Rejyonal Anestezi</b><span>Sayfa hazırlanıyor.</span></div></body></html>`);
+}
 
 // Ana sayfa
 const all = Object.values(COL).flat();
@@ -234,6 +247,6 @@ ${items.length ? `<div class="grid">${items.map(card).join('')}</div>` : '<div c
 // 404, site haritası, robots
 fs.writeFileSync(path.join(OUT, '404.html'), layout({ title: 'Sayfa bulunamadı', rel: '404.html', current: null, body: `<div class="empty">Aradığınız sayfa bulunamadı. <a href="${u('')}">Ana sayfaya dönün.</a></div>` }));
 const urls = ['', ...TABS.map((t) => t.id + '/'), ...all.map((i) => `${i.section}/${i.slug}/`)];
-fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((p) => `<url><loc>${SITE_URL}/${p}</loc></url>`).join('\n')}\n</urlset>\n`);
-fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nDisallow: /admin/\nSitemap: ${SITE_URL}/sitemap.xml\n`);
-console.log(`Derlendi: ${all.length} içerik, ${urls.length} sayfa -> dist/`);
+if (PUBLIC) fs.writeFileSync(path.join(OUT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((p) => `<url><loc>${SITE_URL}/${p}</loc></url>`).join('\n')}\n</urlset>\n`);
+fs.writeFileSync(path.join(OUT, 'robots.txt'), PUBLIC ? `User-agent: *\nDisallow: ${BASE}admin/\nSitemap: ${SITE_URL}/sitemap.xml\n` : `User-agent: *\nDisallow: /\n`);
+console.log(`Derlendi: ${all.length} içerik, ${urls.length} sayfa -> https://${CFG.domain}${BASE} (${PUBLIC ? 'herkese açık, arama motorlarına açık' : 'arama motorlarına kapalı'})`);
